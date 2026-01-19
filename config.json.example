@@ -1,0 +1,103 @@
+{
+  "tushare_token": "YOUR_TOKEN_HERE",
+  "tushare_url": "https://wequant.fun/api/proxy/tushare",
+  "sleep_secs": 0.12,
+  "retry": 3,
+  "threads": 4,
+  "date_ranges": {
+    "default_start_date": "20190101",
+    "default_end_date": "20251231",
+    "lookback_days": 1800,
+    "update_mode": "full",
+    "limits": null,
+    "custom_ranges": {
+      "stocks": {
+        "enabled": false,
+        "exchanges": [
+          "SSE",
+          "SZSE"
+        ],
+        "markets": [
+          "主板",
+          "创业板",
+          "科创板"
+        ],
+        "list_status": [
+          "L"
+        ],
+        "min_list_date": "20200101",
+        "delist_date": "20200101",
+        "exclude_st": true,
+        "exclude_delisted": true,
+        "frequencies": [
+          "daily"
+        ],
+        "start_date": "20200101",
+        "end_date": "auto",
+        "directories": "./temp_stocks",
+        "limits": null
+      },
+      "funds": {
+        "enabled": false,
+        "name": [
+          "ETF",
+          "LOF"
+        ],
+        "status": [
+          "L"
+        ],
+        "min_list_date": "20200101",
+        "delist_date": "20200101",
+        "exclude_delisted": true,
+        "exchanges": [
+          "SSE",
+          "SZSE"
+        ],
+        "management": [],
+        "benchmark": [],
+        "categories": [],
+        "frequencies": [
+          "daily"
+        ],
+        "start_date": "20200101",
+        "end_date": "auto",
+        "directories": "./temp_funds",
+        "limits": null
+      },
+      "indices": {
+        "enabled": true,
+        "markets": [
+          "SSE",
+          "SZSE",
+          "CSI"
+        ],
+        "categories": [
+          "综合指数",
+          "规模指数",
+          "行业指数",
+          "主题指数",
+          "一级行业指数"
+        ],
+        "min_list_date": "20200101",
+        "exp_date": "20200101",
+        "frequencies": [
+          "daily"
+        ],
+        "start_date": "20200101",
+        "end_date": "auto",
+        "directories": "./temp_indices",
+        "limits": 20,
+        "major_only": false
+      }
+    }
+  },
+  "data_root": "./data",
+  "data_format": "Parquet",
+  "backup_enabled": false,
+  "backup_dir": "./backup",
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  }
+}
+
