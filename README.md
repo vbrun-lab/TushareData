@@ -148,6 +148,15 @@ python start.py
 # 输入：1b0 （更新基础数据 → 配置驱动下载 → 退出）
 ```
 
+**完整下载示例（命令行模式）**：
+```bash
+# 1. 先更新基础数据
+python main.py --update-ref
+
+# 2. 下载所有A股日线数据（2019-2025）
+python main.py --all-stocks --frequencies daily --start-date 20190101 --end-date 20251231
+```
+
 ## 🎮 使用方法
 
 ### 交互式界面（推荐）
@@ -186,12 +195,19 @@ python start.py
 
 ### 命令行模式
 
+**完整下载示例**：
+```bash
+# 1. 先更新基础数据
+python main.py --update-ref
+
+# 2. 下载所有A股日线数据（2019-2025）
+python main.py --all-stocks --frequencies daily --start-date 20190101 --end-date 20251231
+```
+
+**其他常用命令**：
 ```bash
 # 更新基础数据
 python main.py --update-ref
-
-# 下载2019-01-01到2025-12-31的全部A股日线数据
-python main.py --all-stocks --frequencies daily --start-date 20190101 --end-date 20251231
 
 # 按日期范围下载部分股票（日线），用于测试
 python main.py --stock-codes 000001.SZ 600000.SH --frequencies daily --start-date 20190101 --end-date 20251231
