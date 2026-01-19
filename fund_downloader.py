@@ -9,6 +9,7 @@ import pandas as pd
 from pathlib import Path
 from typing import List, Dict
 from data_downloader import DataDownloader
+from tqdm import tqdm
 
 
 class FundDownloader(DataDownloader):
@@ -293,17 +294,22 @@ class FundDownloader(DataDownloader):
         total_etfs = len(etf_list)
         self.logger.info(f"开始下载 {total_etfs} 只ETF的数据")
         
-        for idx, row in etf_list.iterrows():
-            try:
-                ts_code = row['ts_code']
-                name = row['name']
-                
-                self.logger.info(f"[{idx+1}/{total_etfs}] 处理ETF: {ts_code} {name}")
-                self.download_single_fund(ts_code, frequencies, save_to_temp)
-                
-            except Exception as e:
-                self.logger.error(f"处理ETF失败 {row['ts_code']}: {e}")
-                continue
+        # 使用 tqdm 显示进度条
+        with tqdm(total=total_etfs, desc="下载ETF数据", unit="只", ncols=100) as pbar:
+            for idx, row in etf_list.iterrows():
+                try:
+                    ts_code = row['ts_code']
+                    name = row['name']
+                    
+                    # 更新进度条描述
+                    pbar.set_description(f"下载 {ts_code} {name[:10]}")
+                    self.download_single_fund(ts_code, frequencies, save_to_temp)
+                    pbar.update(1)
+                    
+                except Exception as e:
+                    self.logger.error(f"处理ETF失败 {row['ts_code']}: {e}")
+                    pbar.update(1)  # 即使失败也更新进度
+                    continue
         
         self.logger.info("所有ETF数据下载完成")
     
@@ -340,17 +346,22 @@ class FundDownloader(DataDownloader):
         total_lofs = len(lof_list)
         self.logger.info(f"开始下载 {total_lofs} 只LOF的数据")
         
-        for idx, row in lof_list.iterrows():
-            try:
-                ts_code = row['ts_code']
-                name = row['name']
-                
-                self.logger.info(f"[{idx+1}/{total_lofs}] 处理LOF: {ts_code} {name}")
-                self.download_single_fund(ts_code, frequencies, save_to_temp)
-                
-            except Exception as e:
-                self.logger.error(f"处理LOF失败 {row['ts_code']}: {e}")
-                continue
+        # 使用 tqdm 显示进度条
+        with tqdm(total=total_lofs, desc="下载LOF数据", unit="只", ncols=100) as pbar:
+            for idx, row in lof_list.iterrows():
+                try:
+                    ts_code = row['ts_code']
+                    name = row['name']
+                    
+                    # 更新进度条描述
+                    pbar.set_description(f"下载 {ts_code} {name[:10]}")
+                    self.download_single_fund(ts_code, frequencies, save_to_temp)
+                    pbar.update(1)
+                    
+                except Exception as e:
+                    self.logger.error(f"处理LOF失败 {row['ts_code']}: {e}")
+                    pbar.update(1)  # 即使失败也更新进度
+                    continue
         
         self.logger.info("所有LOF数据下载完成")
     
@@ -359,14 +370,19 @@ class FundDownloader(DataDownloader):
         total_funds = len(ts_codes)
         self.logger.info(f"开始下载指定的 {total_funds} 只基金数据")
         
-        for idx, ts_code in enumerate(ts_codes):
-            try:
-                self.logger.info(f"[{idx+1}/{total_funds}] 处理基金: {ts_code}")
-                self.download_single_fund(ts_code, frequencies)
-                
-            except Exception as e:
-                self.logger.error(f"处理基金失败 {ts_code}: {e}")
-                continue
+        # 使用 tqdm 显示进度条
+        with tqdm(total=total_funds, desc="下载基金数据", unit="只", ncols=100) as pbar:
+            for idx, ts_code in enumerate(ts_codes):
+                try:
+                    # 更新进度条描述
+                    pbar.set_description(f"下载 {ts_code}")
+                    self.download_single_fund(ts_code, frequencies)
+                    pbar.update(1)
+                    
+                except Exception as e:
+                    self.logger.error(f"处理基金失败 {ts_code}: {e}")
+                    pbar.update(1)  # 即使失败也更新进度
+                    continue
         
         self.logger.info("指定基金数据下载完成")
 

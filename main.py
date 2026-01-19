@@ -13,6 +13,7 @@ import pandas as pd
 import logging
 from pathlib import Path
 from typing import List
+from tqdm import tqdm
 
 from data_downloader import DataDownloader
 from stock_downloader import StockDownloader
@@ -363,21 +364,25 @@ def fill_missing_minutes(config_file: str = 'config.json'):
         success_count = 0
         error_count = 0
         
-        for i in range(0, len(missing_list), batch_size):
-            batch_codes = missing_list[i:i+batch_size]
-            batch_num = i // batch_size + 1
-            
-            logger.info(f'开始下载第 {batch_num}/{total_batches} 批，共 {len(batch_codes)} 只股票')
-            
-            try:
-                # 下载这批股票的1分钟数据
-                downloader.download_stock_list(batch_codes, ['minute_1'])
-                logger.info(f'✅ 第 {batch_num} 批下载完成')
-                success_count += len(batch_codes)
-            except Exception as e:
-                logger.error(f'❌ 第 {batch_num} 批下载失败: {e}')
-                error_count += len(batch_codes)
-                continue
+        # 使用 tqdm 显示进度条
+        with tqdm(total=len(missing_list), desc="补齐分钟数据", unit="只", ncols=100) as pbar:
+            for i in range(0, len(missing_list), batch_size):
+                batch_codes = missing_list[i:i+batch_size]
+                batch_num = i // batch_size + 1
+                
+                # 更新进度条描述
+                pbar.set_description(f"批次 {batch_num}/{total_batches}")
+                
+                try:
+                    # 下载这批股票的1分钟数据
+                    downloader.download_stock_list(batch_codes, ['minute_1'])
+                    success_count += len(batch_codes)
+                    pbar.update(len(batch_codes))
+                except Exception as e:
+                    logger.error(f'❌ 第 {batch_num} 批下载失败: {e}')
+                    error_count += len(batch_codes)
+                    pbar.update(len(batch_codes))  # 即使失败也更新进度
+                    continue
         
         logger.info(f'补充下载完成！成功: {success_count:,}, 失败: {error_count:,}')
         

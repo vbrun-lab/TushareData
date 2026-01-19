@@ -9,6 +9,7 @@ import pandas as pd
 from pathlib import Path
 from typing import List, Dict
 from data_downloader import DataDownloader
+from tqdm import tqdm
 
 
 class IndexDownloader(DataDownloader):
@@ -271,17 +272,22 @@ class IndexDownloader(DataDownloader):
         total_indices = len(index_list)
         self.logger.info(f"开始下载 {total_indices} 只指数的数据")
         
-        for idx, row in index_list.iterrows():
-            try:
-                ts_code = row['ts_code']
-                name = row['name']
-                
-                self.logger.info(f"[{idx+1}/{total_indices}] 处理指数: {ts_code} {name}")
-                self.download_single_index(ts_code, frequencies, save_to_temp)
-                
-            except Exception as e:
-                self.logger.error(f"处理指数失败 {row['ts_code']}: {e}")
-                continue
+        # 使用 tqdm 显示进度条
+        with tqdm(total=total_indices, desc="下载指数数据", unit="只", ncols=100) as pbar:
+            for idx, row in index_list.iterrows():
+                try:
+                    ts_code = row['ts_code']
+                    name = row['name']
+                    
+                    # 更新进度条描述
+                    pbar.set_description(f"下载 {ts_code} {name[:10]}")
+                    self.download_single_index(ts_code, frequencies, save_to_temp)
+                    pbar.update(1)
+                    
+                except Exception as e:
+                    self.logger.error(f"处理指数失败 {row['ts_code']}: {e}")
+                    pbar.update(1)  # 即使失败也更新进度
+                    continue
         
         self.logger.info("所有指数数据下载完成")
     
@@ -306,14 +312,19 @@ class IndexDownloader(DataDownloader):
         
         self.logger.info(f"开始下载 {total_indices} 只主要指数的数据")
         
-        for idx, ts_code in enumerate(major_indices):
-            try:
-                self.logger.info(f"[{idx+1}/{total_indices}] 处理主要指数: {ts_code}")
-                self.download_single_index(ts_code, frequencies, save_to_temp)
-                
-            except Exception as e:
-                self.logger.error(f"处理主要指数失败 {ts_code}: {e}")
-                continue
+        # 使用 tqdm 显示进度条
+        with tqdm(total=total_indices, desc="下载主要指数", unit="只", ncols=100) as pbar:
+            for idx, ts_code in enumerate(major_indices):
+                try:
+                    # 更新进度条描述
+                    pbar.set_description(f"下载 {ts_code}")
+                    self.download_single_index(ts_code, frequencies, save_to_temp)
+                    pbar.update(1)
+                    
+                except Exception as e:
+                    self.logger.error(f"处理主要指数失败 {ts_code}: {e}")
+                    pbar.update(1)  # 即使失败也更新进度
+                    continue
         
         self.logger.info("主要指数数据下载完成")
     
@@ -325,14 +336,19 @@ class IndexDownloader(DataDownloader):
         total_indices = len(ts_codes)
         self.logger.info(f"开始下载指定的 {total_indices} 只指数数据")
         
-        for idx, ts_code in enumerate(ts_codes):
-            try:
-                self.logger.info(f"[{idx+1}/{total_indices}] 处理指数: {ts_code}")
-                self.download_single_index(ts_code, frequencies, save_to_temp)
-                
-            except Exception as e:
-                self.logger.error(f"处理指数失败 {ts_code}: {e}")
-                continue
+        # 使用 tqdm 显示进度条
+        with tqdm(total=total_indices, desc="下载指数数据", unit="只", ncols=100) as pbar:
+            for idx, ts_code in enumerate(ts_codes):
+                try:
+                    # 更新进度条描述
+                    pbar.set_description(f"下载 {ts_code}")
+                    self.download_single_index(ts_code, frequencies, save_to_temp)
+                    pbar.update(1)
+                    
+                except Exception as e:
+                    self.logger.error(f"处理指数失败 {ts_code}: {e}")
+                    pbar.update(1)  # 即使失败也更新进度
+                    continue
         
         self.logger.info("指定指数数据下载完成")
 

@@ -1,4 +1,5 @@
 pandas>=1.5.0
 tushare>=1.2.89
 pyarrow>=10.0.0
-pathlib 
+pathlib
+tqdm>=4.65.0 

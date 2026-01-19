@@ -9,6 +9,7 @@ import pandas as pd
 from pathlib import Path
 from typing import List, Dict
 from data_downloader import DataDownloader
+from tqdm import tqdm
 
 
 class StockDownloader(DataDownloader):
@@ -267,17 +268,22 @@ class StockDownloader(DataDownloader):
         total_stocks = len(stock_list)
         self.logger.info(f"开始下载 {total_stocks} 只股票的数据")
         
-        for idx, row in stock_list.iterrows():
-            try:
-                ts_code = row['ts_code']
-                name = row['name']
-                
-                self.logger.info(f"[{idx+1}/{total_stocks}] 处理股票: {ts_code} {name}")
-                self.download_single_stock(ts_code, frequencies, save_to_temp)
-                
-            except Exception as e:
-                self.logger.error(f"处理股票失败 {row['ts_code']}: {e}")
-                continue
+        # 使用 tqdm 显示进度条
+        with tqdm(total=total_stocks, desc="下载股票数据", unit="只", ncols=100) as pbar:
+            for idx, row in stock_list.iterrows():
+                try:
+                    ts_code = row['ts_code']
+                    name = row['name']
+                    
+                    # 更新进度条描述
+                    pbar.set_description(f"下载 {ts_code} {name[:10]}")
+                    self.download_single_stock(ts_code, frequencies, save_to_temp)
+                    pbar.update(1)
+                    
+                except Exception as e:
+                    self.logger.error(f"处理股票失败 {row['ts_code']}: {e}")
+                    pbar.update(1)  # 即使失败也更新进度
+                    continue
         
         self.logger.info("所有股票数据下载完成")
     
@@ -286,14 +292,19 @@ class StockDownloader(DataDownloader):
         total_stocks = len(ts_codes)
         self.logger.info(f"开始下载指定的 {total_stocks} 只股票数据")
         
-        for idx, ts_code in enumerate(ts_codes):
-            try:
-                self.logger.info(f"[{idx+1}/{total_stocks}] 处理股票: {ts_code}")
-                self.download_single_stock(ts_code, frequencies)
-                
-            except Exception as e:
-                self.logger.error(f"处理股票失败 {ts_code}: {e}")
-                continue
+        # 使用 tqdm 显示进度条
+        with tqdm(total=total_stocks, desc="下载股票数据", unit="只", ncols=100) as pbar:
+            for idx, ts_code in enumerate(ts_codes):
+                try:
+                    # 更新进度条描述
+                    pbar.set_description(f"下载 {ts_code}")
+                    self.download_single_stock(ts_code, frequencies)
+                    pbar.update(1)
+                    
+                except Exception as e:
+                    self.logger.error(f"处理股票失败 {ts_code}: {e}")
+                    pbar.update(1)  # 即使失败也更新进度
+                    continue
         
         self.logger.info("指定股票数据下载完成")
 
